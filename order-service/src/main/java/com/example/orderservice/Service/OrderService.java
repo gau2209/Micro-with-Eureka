@@ -92,7 +92,7 @@ public class OrderService implements IOrderService{
         List<Integer> quan = order.getOrderItemId().stream().map(orderItem -> orderItem.getQuantity()).toList();
 
         InventoryResponse[] InventoryResponseArrays = webClient.build().get()
-                .uri("http://inventory-service/api/inventory",
+                .uri("http://localhost:8083/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("codes",codes).queryParam("quan", quan).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[] .class)

@@ -17,6 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
+@CrossOrigin
 public class OrderController {
     private final IOrderService OderService;
 

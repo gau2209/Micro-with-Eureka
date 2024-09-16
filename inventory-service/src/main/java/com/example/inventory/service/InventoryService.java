@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InventoryService implements IInventoryService{
+public class InventoryService implements IInventoryService {
     private final InventoryRepository inventoryRepository;
     private final WebClient.Builder webClientBuilder;
 
@@ -36,36 +36,39 @@ public class InventoryService implements IInventoryService{
 //
 //    }
 
-@Transactional
-@Override
-    public List<InventoryResponse> isInStock(@RequestParam List<String> codes, @RequestParam List<Integer> quan){
+    @Transactional
+    @Override
+    public List<InventoryResponse> isInStock(@RequestParam List<String> codes, @RequestParam List<Integer> quan) {
         List<Inventory> inventories = new ArrayList<>();
         try {
-            for(int i =0 ;i<codes.size();i++){
-                Inventory invent = this.inventoryRepository.findByCode(codes.get(i)).orElseThrow(() -> new RuntimeException( codes + " doesnt exist"));
+            for (int i = 0; i < codes.size(); i++) {
+                Inventory invent = this.inventoryRepository.findByCode(codes.get(i)).orElseThrow(() -> new RuntimeException(codes + " doesnt exist"));
 
-                if(invent.getQuantity() < quan.get(i)){
+                if (invent.getQuantity() < quan.get(i)) {
                     throw new Exception("Not enough quantity for " + codes.get(i));
                 }
 
                 invent.setQuantity(invent.getQuantity() - quan.get(i));
                 inventories.add(invent);
-        }
-        }catch (Exception ex){
+            }
+        } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
-      }
+        }
         return inventories.stream().map(inventory -> InventoryResponse.builder()
                 .code(inventory.getCode())
-                .isInStock(inventory.getQuantity()>0)
+                .isInStock(inventory.getQuantity() > 0)
                 .build()).toList();
     }
+
     @Override
     public List<InventoryResponse> getAllInventory() {
-         List<Inventory> inventories= this.inventoryRepository.findAll();
-         List<InventoryResponse> inventoryResponses = new ArrayList<>();
-        for (Inventory i: inventories) {
+        List<Inventory> inventories = this.inventoryRepository.findAll();
+        List<InventoryResponse> inventoryResponses = new ArrayList<>();
+
+        for (Inventory i : inventories) {
             InventoryResponse inventoryResponse = new InventoryResponse();
             inventoryResponse.setCode(i.getCode());
+            inventoryResponse.setInStock(i.getQuantity()>0);
             inventoryResponses.add(inventoryResponse);
         }
         return inventoryResponses;
@@ -73,3 +76,4 @@ public class InventoryService implements IInventoryService{
 
 
 }
+

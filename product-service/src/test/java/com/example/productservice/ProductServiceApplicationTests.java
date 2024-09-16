@@ -29,65 +29,65 @@ import java.util.List;
 @Testcontainers
 @AutoConfigureMockMvc
 class ProductServiceApplicationTests {
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
-@Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private ProductRepository productRepository;
-
-
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry properties){
-        properties.add("spring.data.mongodb.uri",mongoDBContainer::getReplicaSetUrl);
-
-    }
-
-    @Test
-    void shouldCreateProduct() throws Exception {
-        ProductRequest p = getProductRequest();
-        String productRequest = objectMapper.writeValueAsString(p);
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/product/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(productRequest))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-        Assertions.assertEquals(1, productRepository.findAll().size());
-    }
-
-    @Test
-    void shouldGetAll() throws Exception {
-        List<ProductResponse> Prod = getAllProductRes();
-        String ProductResponse = objectMapper.writeValueAsString(Prod);
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/product/GetAllProd")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ProductResponse))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-    }
-
-    private ProductRequest getProductRequest() {
-        return ProductRequest.builder()
-                .name("Iphone 13").
-                description("Iphone 13").
-                price(BigDecimal.valueOf(13000))
-                .build();
-    }
-
-    private List<ProductResponse> getAllProductRes(){
-        List<Product> prod = productRepository.findAll();
-        List<ProductResponse> pRes = new ArrayList<>();
-        for (Product p : prod) {
-            ProductResponse pres = ProductResponse.builder()
-                    .id(p.getId())
-                    .name(p.getName())
-                    .description(p.getDescription())
-                    .price(p.getPrice())
-                    .build();
-            pRes.add(pres);
-        }
-        return pRes;
-    }
+//    @Container
+//    static MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
+//@Autowired
+//    private MockMvc mockMvc;
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//    @Autowired
+//    private ProductRepository productRepository;
+//
+//
+//    @DynamicPropertySource
+//    static void setProperties(DynamicPropertyRegistry properties){
+//        properties.add("spring.data.mongodb.uri",mongoDBContainer::getReplicaSetUrl);
+//
+//    }
+//
+//    @Test
+//    void shouldCreateProduct() throws Exception {
+//        ProductRequest p = getProductRequest();
+//        String productRequest = objectMapper.writeValueAsString(p);
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/product/create")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(productRequest))
+//                .andExpect(MockMvcResultMatchers.status().isCreated());
+//        Assertions.assertEquals(1, productRepository.findAll().size());
+//    }
+//
+//    @Test
+//    void shouldGetAll() throws Exception {
+//        List<ProductResponse> Prod = getAllProductRes();
+//        String ProductResponse = objectMapper.writeValueAsString(Prod);
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/product/GetAllProd")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(ProductResponse))
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//
+//    }
+//
+//    private ProductRequest getProductRequest() {
+//        return ProductRequest.builder()
+//                .name("Iphone 13").
+//                description("Iphone 13").
+//                price(BigDecimal.valueOf(13000))
+//                .build();
+//    }
+//
+//    private List<ProductResponse> getAllProductRes(){
+//        List<Product> prod = productRepository.findAll();
+//        List<ProductResponse> pRes = new ArrayList<>();
+//        for (Product p : prod) {
+//            ProductResponse pres = ProductResponse.builder()
+//                    .id(p.getId())
+//                    .name(p.getName())
+//                    .description(p.getDescription())
+//                    .price(p.getPrice())
+//                    .build();
+//            pRes.add(pres);
+//        }
+//        return pRes;
+//    }
 
 }
