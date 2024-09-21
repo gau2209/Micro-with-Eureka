@@ -3,12 +3,9 @@ package com.example.orderservice.Service;
 import com.example.orderservice.Entity.Order;
 import com.example.orderservice.Entity.orderItem;
 import com.example.orderservice.Repository.IOrderRepository;
-import com.example.orderservice.Request.InventoryResponse;
-import com.example.orderservice.Request.OrderItemCoQu;
 import com.example.orderservice.Request.OrderItemRequest;
 import com.example.orderservice.Request.OrderRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.orderservice.client.InventoryClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,64 +18,7 @@ import java.util.*;
 @Transactional
 public class OrderService implements IOrderService{
     private final IOrderRepository orderRepository;
-    private final WebClient.Builder webClient;
-
-//    public OrderService(IOrderRepository orderRepository){
-//        this.orderRepository=orderRepository;
-//    }
-//@Override
-//    public void placeOrder(OrderRequest orderRequest) throws IllegalAccessException {
-//        Order order = new Order();
-//        order.setOrderNumber(UUID.randomUUID().toString());
-//        List<orderItem> orderItems = orderRequest.getItems().stream()
-//                .map(this::maptoDTO).toList();
-//        order.setOrderItemId(orderItems);
-//
-//        List<String> codes = order.getOrderItemId().stream().map(orderItem::getCode).toList();
-//
-//        InventoryResponse[] InventoryResponseArrays = webClient.build().get()
-//                .uri("http://inventory-service/api/inventory",
-//                        uriBuilder -> uriBuilder.queryParam("codes",codes).build())
-//                .retrieve()
-//                .bodyToMono(InventoryResponse[] .class)
-//                .block();
-//
-//        boolean b = Arrays.stream(InventoryResponseArrays).allMatch(InventoryResponse::isInStock);
-//
-//        if(b){
-//            this.orderRepository.save(order);
-//        }
-//       else{
-//           throw new IllegalAccessException("Product is not in stock, pls try again");
-//        }
-//    }
-
-//@Override
-//    public void placeOrder(OrderRequest orderRequest) throws IllegalAccessException {
-//        Order order = new Order();
-//        order.setOrderNumber(UUID.randomUUID().toString());
-//        List<orderItem> orderItems = orderRequest.getItems().stream()
-//                .map(this::maptoDTO).toList();
-//        order.setOrderItemId(orderItems);
-//
-//        List<String> codes = order.getOrderItemId().stream().map(orderItem::getCode).toList();
-//
-//        InventoryResponse[] InventoryResponseArrays = webClient.build().get()
-//                .uri("http://inventory-service/api/inventory",
-//                        uriBuilder -> uriBuilder.queryParam("codes",codes).build())
-//                .retrieve()
-//                .bodyToMono(InventoryResponse[] .class)
-//                .block();
-//
-//        boolean b = Arrays.stream(InventoryResponseArrays).allMatch(InventoryResponse::isInStock);
-//
-//        if(b){
-//            this.orderRepository.save(order);
-//        }
-//       else{
-//           throw new IllegalAccessException("Product is not in stock, pls try again");
-//        }
-//    }
+    private final InventoryClient inventoryClient;
 
     @Override
     public void placeOrder(OrderRequest orderRequest) throws IllegalAccessException {
@@ -89,23 +29,19 @@ public class OrderService implements IOrderService{
         order.setOrderItemId(orderItems);
 
         List<String> codes = order.getOrderItemId().stream().map(orderItem::getCode).toList();
-        List<Integer> quan = order.getOrderItemId().stream().map(orderItem -> orderItem.getQuantity()).toList();
+        List<Integer> quan = order.getOrderItemId().stream().map(orderItem::getQuantity).toList();
 
-        InventoryResponse[] InventoryResponseArrays = webClient.build().get()
-                .uri("http://localhost:8083/api/inventory",
-                        uriBuilder -> uriBuilder.queryParam("codes",codes).queryParam("quan", quan).build())
-                .retrieve()
-                .bodyToMono(InventoryResponse[] .class)
-                .block();
 
-        boolean b = Arrays.stream(InventoryResponseArrays).allMatch(InventoryResponse::isInStock);
+        boolean b = this.inventoryClient.isInStock(codes,quan);
 
         if(b){
             this.orderRepository.save(order);
         }
         else{
-            throw new IllegalAccessException("Product is not in stock, pls try again");
+            throw new IllegalAccessException("Product " + orderRequest.getItems()+" is not in stock, pls try again");
         }
+
+
     }
 
     @Override

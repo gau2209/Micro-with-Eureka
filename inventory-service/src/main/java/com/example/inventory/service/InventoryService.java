@@ -19,22 +19,6 @@ public class InventoryService implements IInventoryService {
     private final InventoryRepository inventoryRepository;
     private final WebClient.Builder webClientBuilder;
 
-//    @Transactional(readOnly = true)
-//    public List<InventoryResponse> isInStock(List<String> codes){
-//        List<Inventory> inventories = new ArrayList<>();
-//        try {
-//            for(String i : codes){
-//                Inventory invent = this.inventoryRepository.findByCode(i).orElseThrow(() -> new RuntimeException( i + " doesnt exist"));
-//                inventories.add(invent);
-//        }
-//        }catch (Exception ex){
-//            throw new RuntimeException(ex.getMessage());
-//      }
-//        return inventories.stream().map(inventory -> InventoryResponse.builder()
-//                .code(inventory.getCode())
-//                .isInStock(inventory.getQuantity()>0).build()).toList();
-//
-//    }
 
     @Transactional
     @Override
